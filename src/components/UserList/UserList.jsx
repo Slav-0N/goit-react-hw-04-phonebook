@@ -1,78 +1,67 @@
 import ContactItems from 'components/ContactItem/ContactItem';
 import FindName from 'components/Find/find';
 import Form from 'components/Form/Form';
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 
-class UserList extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  };
-  componentDidMount() {
-    const storedData = localStorage.getItem('contacts');
-    if (storedData) {
-      this.setState({ contacts: JSON.parse(storedData) });
-    }
-  }
-  componentDidUpdate(_, prevState) {
-    if (prevState.contacts.length !== this.state.contacts.length) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-  }
+const UserList = () => {
+  const [contacts, setContacts] = useState(() => {
+    return JSON.parse(window.localStorage.getItem('contacts')) ?? [];
+  });
 
-  createUser = body => {
-    const isExistContact = this.state.contacts.find(
-      el => el.name.toLowerCase() === body.name.toLowerCase()
+  const [filter, setFilter] = useState('');
+
+  useEffect(() => {
+    console.log(contacts);
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
+  const createUser = (number, name) => {
+    const isExistContact = contacts.find(
+      el => el.name.toLowerCase() === name.toLowerCase()
     );
 
     if (isExistContact) return alert('Existing Contact');
 
     const newUserElement = {
-      ...body,
+      name: name,
+      number: number,
       id: nanoid(),
     };
 
-    this.setState(prevState => ({
-      contacts: [...prevState.contacts, newUserElement],
-    }));
+    setContacts(prevContacts => [...prevContacts, newUserElement]);
   };
 
-  changeFilterValue = filterQuery => {
-    this.setState({ filter: filterQuery });
+  const changeFilterValue = filterQuery => setFilter(filterQuery);
+
+  const handleDelete = id => {
+    return setContacts(prevContacts => {
+      return prevContacts.filter(el => el.id !== id);
+    });
   };
 
-  handleDelete = id => {
-    this.setState(prev => ({
-      contacts: prev.contacts.filter(el => el.id !== id),
-    }));
+  const getFilteredContacts = () => {
+    return contacts.filter(contact => {
+      console.log(filter);
+      return contact.name.toLowerCase().includes(filter.toLowerCase());
+    });
   };
 
-  getFilteredContacts = () => {
-    const { contacts, filter } = this.state;
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(filter.toLowerCase())
-    );
-  };
+  return (
+    <div>
+      <h1>Phonebook</h1>
+      <Form createUser={createUser} />
 
-  render() {
-    const filtered = this.getFilteredContacts();
-    return (
-      <div>
-        <h1>Phonebook</h1>
-        <Form createUser={this.createUser} />
-
-        <h2>Contacts</h2>
-        <FindName
-          changeFilterValue={this.changeFilterValue}
-          value={this.state.filter}
+      <h2>Contacts</h2>
+      <FindName changeFilterValue={changeFilterValue} value={filter} />
+      {getFilteredContacts().length > 0 && (
+        <ContactItems
+          contacts={getFilteredContacts()}
+          handleDelete={handleDelete}
         />
-        {filtered.length > 0 && (
-          <ContactItems contacts={filtered} handleDelete={this.handleDelete} />
-        )}
-      </div>
-    );
-  }
-}
+      )}
+    </div>
+  );
+};
 
 export default UserList;
