@@ -1,7 +1,6 @@
 import React from 'react';
 import Contacts from './ContactItem.syled';
 const ContactItems = ({ contacts, handleDelete }) => {
-  console.log(contacts);
   return (
     <Contacts>
       {contacts.map(el => {

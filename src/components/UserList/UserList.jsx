@@ -12,7 +12,6 @@ const UserList = () => {
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
-    console.log(contacts);
     localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
 
@@ -42,7 +41,6 @@ const UserList = () => {
 
   const getFilteredContacts = () => {
     return contacts.filter(contact => {
-      console.log(filter);
       return contact.name.toLowerCase().includes(filter.toLowerCase());
     });
   };
