@@ -22,7 +22,7 @@ const Form = ({ createUser }) => {
   const handleSubmit = event => {
     event.preventDefault();
 
-    createUser(number, name);
+    createUser({ number, name });
     setName('');
     setNumber('');
   };

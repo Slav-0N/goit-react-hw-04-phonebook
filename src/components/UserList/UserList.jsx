@@ -15,7 +15,8 @@ const UserList = () => {
     localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
 
-  const createUser = (number, name) => {
+  const createUser = UserParams => {
+    const { number, name } = UserParams;
     const isExistContact = contacts.find(
       el => el.name.toLowerCase() === name.toLowerCase()
     );
